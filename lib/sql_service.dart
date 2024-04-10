@@ -47,6 +47,18 @@ class DatabaseHelper{
     return data;
   }
 
+  Future<Map<String, Object?>?> getDataAt(int id) async {
+    await initialise;
+    var data = await _database!.rawQuery(
+      '''
+        SELECT * FROM $_tableName WHERE id=?
+      ''',
+      [id]
+    );
+    if (data.length == 1) return data[0];
+    return null;
+  }
+
   Future<bool> insertData(int id, String text) async {
     await initialise;
     int? result = await _database?.insert(
@@ -57,6 +69,18 @@ class DatabaseHelper{
       },
     );
     if(result != id) return false;
+    return true;
+  }
+
+  Future<bool> updateData(int id, String text) async {
+    await initialise;
+    int? result = await _database!.rawUpdate(
+      '''
+        UPDATE $_tableName SET text = ? WHERE id = ?
+      ''',
+      [text, id]
+    );
+    if (result != 1) return false;
     return true;
   }
 

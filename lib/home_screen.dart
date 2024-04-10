@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:todo/update_note.dart';
 import './sql_service.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -20,7 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
           borderRadius: BorderRadius.horizontal(
               left: Radius.circular(20), right: Radius.circular(20.0)),
         ),
-        title: const Text("Notes"),
+        title: const Text("Todo"),
         centerTitle: true,
         scrolledUnderElevation: 1,
       ),
@@ -37,33 +38,123 @@ class _HomeScreenState extends State<HomeScreen> {
                   itemCount: snapshot.data?.length ?? 0,
                   separatorBuilder: (context, index) => const Divider(),
                   itemBuilder: (context, index) {
-                    return Container(
-                      padding: const EdgeInsets.all(10.0),
-                      decoration: BoxDecoration(
-                        color: (index % 2 == 0) ? Colors.lightBlue.shade50 : Colors.lightGreen.shade50,
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              snapshot.data?.elementAt(index)['text'].toString() as String,
-                              maxLines: null,
+                    return GestureDetector(
+                      onTap: () async {
+                        if (!mounted) return;
+                        await showModalBottomSheet(
+                          context: context,
+                          showDragHandle: true,
+                          isDismissible: true,
+                          clipBehavior: Clip.none,
+                          builder: (context) => Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                alignment: Alignment.center,
+                                padding: const EdgeInsets.all(20.0),
+                                decoration: const BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.vertical(top: Radius.circular(10.0))
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  mainAxisSize: MainAxisSize.min,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "Todo No.: ${index+1}",
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    const SizedBox(
+                                      height: 10.0,
+                                    ),
+                                    Container(
+                                      padding: const EdgeInsets.all(10.0),
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey.shade300,
+                                        borderRadius: BorderRadius.circular(10.0),
+                                      ),
+                                      child: Text(
+                                        snapshot.data?.elementAt(index)['text'] as String,
+                                        style: const TextStyle(
+                                          color: Colors.black
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          )
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(10.0),
+                        decoration: BoxDecoration(
+                          color: (index % 2 == 0) ? Colors.lightBlue.shade50 : Colors.lightGreen.shade50,
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                snapshot.data?.elementAt(index)['text'].toString() as String,
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
-                          ),
-                          GestureDetector(
-                            onTap: () async {
-                              bool isSuccess = await databaseHelper.deleteData(index);
-                              if(!mounted) return;
-                              if (isSuccess) setState(() {});
-                            },
-                            child: Icon(
-                              Icons.delete_outline,
-                              color: Colors.red.shade800,
+                            const SizedBox(
+                              width: 10.0,
                             ),
-                          ),
-                        ],
+                            GestureDetector(
+                              onTap: () async {
+                                if (!mounted) return;
+                                await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => UpdateTodo(
+                                      index: index,
+                                      databaseHelper: databaseHelper
+                                    ),
+                                  ),
+                                );
+                                setState(() {});
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(5.0),
+                                decoration: BoxDecoration(
+                                  color: Colors.green.shade200,
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                                child: Icon(
+                                  Icons.edit,
+                                  color: Colors.green.shade800,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(
+                              width: 10.0,
+                            ),
+                            GestureDetector(
+                              onTap: () async {
+                                bool isSuccess = await databaseHelper.deleteData(index);
+                                if(!mounted) return;
+                                if (isSuccess) setState(() {});
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(5.0),
+                                decoration: BoxDecoration(
+                                  color: Colors.red.shade100,
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                                child: Icon(
+                                  Icons.delete_outline,
+                                  color: Colors.red.shade800,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     );
                   },

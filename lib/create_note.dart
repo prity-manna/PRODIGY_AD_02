@@ -19,10 +19,10 @@ class _CreateNoteState extends State<CreateNote> {
       backgroundColor: Colors.green,
       appBar: AppBar(
         shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.horizontal(
-              left: Radius.circular(20), right: Radius.circular(20.0)),
+          borderRadius: BorderRadius.vertical(
+              bottom: Radius.circular(20)),
         ),
-        title: const Text("Create A Note"),
+        title: const Text("Create A Todo"),
         centerTitle: true,
         scrolledUnderElevation: 1,
       ),
@@ -46,7 +46,7 @@ class _CreateNoteState extends State<CreateNote> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text("Note No.: ${index+1}"),
+                      Text("Todo No.: ${index+1}"),
                       const Divider(),
                       Expanded(
                         child: TextFormField(
@@ -76,7 +76,7 @@ class _CreateNoteState extends State<CreateNote> {
                         bool isSuccess = await databaseHelper.insertData(index, textEditingController.text);
                         if(!mounted) return;
                         Navigator.pop(
-                          context,
+                          this.context,
                           isSuccess,
                         );
                       }
